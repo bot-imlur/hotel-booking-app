@@ -34,7 +34,12 @@ export const createBookingSchema = z.object({
   source: z.enum(BOOKING_SOURCES),
   advance_paid: z.number().min(0).default(0),
   notes: z.string().max(1000).optional().default(""),
-  extra_charges: z.array(z.object({ item: z.string(), amount: z.number().min(0) })).optional().default([]),
+  extra_charges: z.array(
+    z.object({
+      item: z.string(),
+      amount: z.number().gt(0, "Extra charge amount must be greater than 0"),
+    })
+  ).optional().default([]),
   rooms: z.array(bookingRoomSchema).min(1, "At least one room is required"),
 }).refine(
   (data) => data.check_out_date > data.check_in_date,
@@ -53,7 +58,12 @@ export const updateBookingSchema = z.object({
   status: z.enum(BOOKING_STATUSES).optional(),
   advance_paid: z.number().min(0).optional(),
   notes: z.string().max(1000).optional(),
-  extra_charges: z.array(z.object({ item: z.string(), amount: z.number().min(0) })).optional(),
+  extra_charges: z.array(
+    z.object({
+      item: z.string(),
+      amount: z.number().gt(0, "Extra charge amount must be greater than 0"),
+    })
+  ).optional(),
 });
 
 /**

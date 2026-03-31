@@ -8,9 +8,9 @@
 
 /* Calendar Grid */
 .calendar { flex: 1; min-width: 0; }
-.dayHeaders { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: var(--space-sm); }
+.dayHeaders { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; margin: 0 auto var(--space-sm); max-width: 840px; width: 100%; }
 .dayHeader { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; padding: var(--space-sm); }
-.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; margin: 0 auto; max-width: 840px; width: 100%; }
 
 /* Day Cell */
 .cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: var(--space-sm) var(--space-xs); min-height: 72px; border-radius: var(--radius-md); background: var(--bg-card); border: 1px solid transparent; transition: all var(--transition-fast); cursor: pointer; }
@@ -35,6 +35,7 @@
 .drawerHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-sm); margin-bottom: var(--space-md); }
 .drawerHeader h3 { font-size: 0.95rem; font-weight: 700; }
 .drawerSummary { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: var(--space-md); }
+.addBookingBtn { width: 100%; margin-bottom: var(--space-md); }
 
 /* Booking Cards in drawer */
 .bookingList { display: flex; flex-direction: column; gap: var(--space-sm); }

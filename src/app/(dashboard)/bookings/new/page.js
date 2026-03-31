@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 import { formatCurrency, SOURCE_CONFIG, BOOKING_SOURCES } from "@/lib/utils";
 
@@ -9,7 +9,16 @@ const STEPS = ["Guest Details", "Dates & Source", "Select Rooms", "Review & Pay"
 const DEFAULT_MATTRESS_RATE = 500;
 
 export default function NewBookingPage() {
+  return (
+    <Suspense fallback={<div className={styles.container}><h2>New Booking</h2></div>}>
+      <NewBookingPageContent />
+    </Suspense>
+  );
+}
+
+function NewBookingPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -20,6 +29,16 @@ export default function NewBookingPage() {
   const [availability, setAvailability] = useState(null);
   const [selectedRooms, setSelectedRooms] = useState({});
   const [payment, setPayment] = useState({ advance_paid: 0, notes: "" });
+
+  useEffect(() => {
+    const checkInFromQuery = searchParams.get("checkIn");
+    if (!checkInFromQuery || !/^\d{4}-\d{2}-\d{2}$/.test(checkInFromQuery)) return;
+
+    setDates((prev) => {
+      if (prev.check_in_date) return prev;
+      return { ...prev, check_in_date: checkInFromQuery };
+    });
+  }, [searchParams]);
 
   function toNumber(value, fallback = 0) {
     if (value === "" || value === null || value === undefined) return fallback;

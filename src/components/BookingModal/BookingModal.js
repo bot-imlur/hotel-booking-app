@@ -9,13 +9,36 @@ export default function BookingModal({ bookingId, onClose, onStatusChange }) {
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionError, setActionError] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [savingEdit, setSavingEdit] = useState(false);
 
+  function getApiErrorMessage(data, fallback = "Something went wrong. Please try again.") {
+    if (!data) return fallback;
+    if (typeof data.error === "string" && data.error.trim()) {
+      const details = data.details;
+      if (details && typeof details === "object") {
+        const detailParts = Object.entries(details)
+          .flatMap(([field, messages]) =>
+            (Array.isArray(messages) ? messages : [messages]).map((msg) =>
+              String(msg || "")
+            )
+          )
+          .filter(Boolean);
+        if (detailParts.length > 0) {
+          return `${data.error}: ${detailParts.join(", ")}`;
+        }
+      }
+      return data.error;
+    }
+    return fallback;
+  }
+
   function startEdit() {
+    setActionError(null);
     setEditForm({
       guest_name: booking.guest_name || "",
       guest_phone: booking.guest_phone || "",
@@ -31,10 +54,12 @@ export default function BookingModal({ bookingId, onClose, onStatusChange }) {
 
   async function saveEdit() {
     setSavingEdit(true);
+    setActionError(null);
     
     // Clean up empty lines
     const payload = {
       ...editForm,
+      advance_paid: editForm.advance_paid === "" ? 0 : Number(editForm.advance_paid) || 0,
       extra_charges: (editForm.extra_charges || []).filter(c => c.item.trim() !== "" || Number(c.amount) > 0).map(c => ({
         item: c.item.trim(),
         amount: Number(c.amount) || 0
@@ -54,10 +79,11 @@ export default function BookingModal({ bookingId, onClose, onStatusChange }) {
         onStatusChange?.();
       } else {
         const data = await res.json();
-        alert("Failed to update booking: " + JSON.stringify(data));
+        setActionError(getApiErrorMessage(data, "Failed to update booking."));
       }
     } catch (err) {
       console.error("Save edit error:", err);
+      setActionError("Network error while saving booking. Please retry.");
     }
     setSavingEdit(false);
   }
@@ -92,6 +118,7 @@ export default function BookingModal({ bookingId, onClose, onStatusChange }) {
 
   async function handleStatusChange(newStatus) {
     setUpdatingStatus(true);
+    setActionError(null);
     try {
       const res = await fetch(`/api/bookings/${bookingId}`, {
         method: "PUT",
@@ -104,11 +131,11 @@ export default function BookingModal({ bookingId, onClose, onStatusChange }) {
         onStatusChange?.();
       } else {
         const errData = await res.json();
-        alert("Failed to update status: " + JSON.stringify(errData));
+        setActionError(getApiErrorMessage(errData, "Failed to update status."));
       }
     } catch (err) {
-      alert("Status update error: " + err.message);
       console.error("Status update error:", err);
+      setActionError("Network error while updating status. Please retry.");
     }
     setUpdatingStatus(false);
   }
@@ -161,6 +188,9 @@ export default function BookingModal({ bookingId, onClose, onStatusChange }) {
 
           {error && (
             <p className={styles.errorMsg}>⚠ {error}</p>
+          )}
+          {actionError && (
+            <p className={styles.errorMsg}>⚠ {actionError}</p>
           )}
 
           {booking && !loading && (
@@ -250,7 +280,13 @@ export default function BookingModal({ bookingId, onClose, onStatusChange }) {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                     <div className="form-group">
                       <label className="form-label">Advance Paid (₹)</label>
-                      <input type="number" min="0" className="form-input" value={editForm.advance_paid} onChange={e => setEditForm({...editForm, advance_paid: Number(e.target.value)})} />
+                      <input
+                        type="number"
+                        min="0"
+                        className="form-input"
+                        value={editForm.advance_paid}
+                        onChange={e => setEditForm({ ...editForm, advance_paid: e.target.value === "" ? "" : Number(e.target.value) })}
+                      />
                     </div>
                   </div>
                   <div className="form-group" style={{ marginTop: "16px" }}>

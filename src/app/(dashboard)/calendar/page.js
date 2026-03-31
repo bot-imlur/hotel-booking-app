@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import {
   format,
@@ -81,6 +82,8 @@ export default function CalendarPage() {
   }
 
   const days = calendarData?.days || {};
+  const selectedDateBooked = selectedDate ? days[selectedDate] || 0 : 0;
+  const canAddBooking = selectedDate && selectedDateBooked < totalRooms;
 
   return (
     <div className={styles.container}>
@@ -161,6 +164,11 @@ export default function CalendarPage() {
                 <p className={styles.drawerSummary}>
                   {dateBookings.rooms_booked}/{totalRooms} rooms booked · {dateBookings.bookings.length} booking(s)
                 </p>
+                {canAddBooking && (
+                  <Link href={`/bookings/new?checkIn=${selectedDate}`} className={`btn btn-primary btn-sm ${styles.addBookingBtn}`}>
+                    + Add Booking
+                  </Link>
+                )}
                 <div className={styles.bookingList}>
                   {dateBookings.bookings.map((b) => (
                     <div key={b.id} className={`card card-clickable ${styles.bookingCard}`}
@@ -195,7 +203,14 @@ export default function CalendarPage() {
                 </div>
               </>
             ) : (
-              <p className={styles.noBookings}>No bookings for this date</p>
+              <>
+                {canAddBooking && (
+                  <Link href={`/bookings/new?checkIn=${selectedDate}`} className={`btn btn-primary btn-sm ${styles.addBookingBtn}`}>
+                    + Add Booking
+                  </Link>
+                )}
+                <p className={styles.noBookings}>No bookings for this date</p>
+              </>
             )}
           </div>
         )}

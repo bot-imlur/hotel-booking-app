@@ -56,6 +56,50 @@ export default function ExportModal({ currentMonth, onClose }) {
     setTabs((prev) => ({ ...prev, [tab]: !prev[tab] }));
   }
 
+  function handleFromChange(nextFrom) {
+    setFrom(nextFrom);
+    if (!nextFrom) return;
+
+    let fromDate;
+    try {
+      fromDate = parseISO(nextFrom);
+      if (Number.isNaN(fromDate.getTime())) return;
+    } catch {
+      return;
+    }
+
+    if (!to) {
+      setTo(nextFrom);
+      return;
+    }
+
+    let toDate;
+    try {
+      toDate = parseISO(to);
+      if (Number.isNaN(toDate.getTime())) {
+        setTo(nextFrom);
+        return;
+      }
+    } catch {
+      setTo(nextFrom);
+      return;
+    }
+
+    const fromYear = fromDate.getFullYear();
+    const fromMonth = fromDate.getMonth();
+    const isSameMonth =
+      toDate.getFullYear() === fromYear && toDate.getMonth() === fromMonth;
+    if (isSameMonth) return;
+
+    const toDay = toDate.getDate();
+    const lastDayOfFromMonth = new Date(fromYear, fromMonth + 1, 0).getDate();
+    const safeDay = Math.min(toDay, lastDayOfFromMonth);
+    const adjustedToDate = new Date(fromYear, fromMonth, safeDay);
+    const adjustedTo = format(adjustedToDate, "yyyy-MM-dd");
+
+    setTo(adjustedTo < nextFrom ? nextFrom : adjustedTo);
+  }
+
   // ── Generate ─────────────────────────────────────────────────────────
   async function handleGenerate() {
     setError(null);
@@ -150,7 +194,7 @@ export default function ExportModal({ currentMonth, onClose }) {
                   type="date"
                   className={`form-input ${styles.dateInput}`}
                   value={from}
-                  onChange={(e) => setFrom(e.target.value)}
+                  onChange={(e) => handleFromChange(e.target.value)}
                   disabled={loading}
                   style={{ colorScheme: "dark" }}
                 />
