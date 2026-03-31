@@ -1,0 +1,49 @@
+.container { display: flex; flex-direction: column; gap: var(--space-xl); }
+.header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-md); }
+.header h2 { font-size: 1.5rem; font-weight: 700; }
+.headerRight { display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap; }
+.monthNav { display: flex; align-items: center; gap: var(--space-sm); }
+.monthLabel { font-size: 0.95rem; font-weight: 600; min-width: 160px; text-align: center; }
+
+/* Stat Cards */
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+.statCard { display: flex; flex-direction: column; gap: var(--space-xs); }
+.statLabel { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+.statValue { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+.statSub { font-size: 0.75rem; color: var(--text-muted); }
+.sourceBreakdown { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-xs); }
+
+/* Occupancy bar */
+.occupancyBar { height: 6px; background: var(--bg-tertiary); border-radius: 3px; margin-top: var(--space-sm); overflow: hidden; }
+.occupancyFill { height: 100%; background: linear-gradient(90deg, var(--accent-success), var(--accent-primary)); border-radius: 3px; transition: width 0.5s ease; }
+
+/* Sections */
+.sectionGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+.section { display: flex; flex-direction: column; gap: var(--space-md); }
+.sectionTitle { font-size: 0.95rem; font-weight: 700; }
+
+/* Source breakdown */
+.sourceList { display: flex; flex-direction: column; gap: var(--space-md); }
+.sourceRow { display: flex; justify-content: space-between; align-items: center; gap: var(--space-lg); }
+.sourceInfo { display: flex; align-items: center; gap: var(--space-sm); }
+.sourceDot { width: 10px; height: 10px; border-radius: 50%; }
+.sourceName { font-size: 0.85rem; font-weight: 600; }
+.sourceBookings { font-size: 0.7rem; color: var(--text-muted); }
+.sourceRight { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; min-width: 120px; }
+.sourceAmount { font-size: 0.85rem; font-weight: 700; }
+.sourceBar { width: 100%; height: 4px; background: var(--bg-tertiary); border-radius: 2px; overflow: hidden; }
+.sourceBarFill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+/* Payment */
+.paymentGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+.paymentItem { display: flex; flex-direction: column; gap: 2px; }
+.paymentLabel { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.paymentValue { font-size: 1.1rem; font-weight: 700; }
+
+/* Daily occupancy grid */
+.occupancyGrid { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.occupancyDay { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 42px; }
+.occupancyDate { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+
+@media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } .sectionGrid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } .paymentGrid { grid-template-columns: 1fr; } }

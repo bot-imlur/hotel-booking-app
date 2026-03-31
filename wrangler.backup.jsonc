@@ -1,0 +1,51 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rajmandir-kunj-backup",
+  "main": "backup-worker.js",
+  "compatibility_date": "2026-03-10",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // ── Cron: Every Sunday at 02:00 UTC (07:30 IST) ─────────────────────────
+  "triggers": {
+    "crons": ["0 2 * * 0"]
+  },
+
+  // ── Bindings ─────────────────────────────────────────────────────────────
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hotel-db",
+      "database_id": "local"
+    }
+  ],
+  "r2_buckets": [
+    {
+      // Run once to create: npx wrangler r2 bucket create rjk-db-backups
+      "binding": "BACKUP_BUCKET",
+      "bucket_name": "rjk-db-backups-dev"
+    }
+  ],
+
+  // ── Production overrides ─────────────────────────────────────────────────
+  "env": {
+    "production": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "hotel-db",
+          "database_id": "db5df36c-c6ff-41e2-bd9a-07fd5edf8c64"
+        }
+      ],
+      "r2_buckets": [
+        {
+          // Run once to create: npx wrangler r2 bucket create rjk-db-backups
+          "binding": "BACKUP_BUCKET",
+          "bucket_name": "rjk-db-backups"
+        }
+      ],
+      "triggers": {
+        "crons": ["0 2 * * 0"]
+      }
+    }
+  }
+}

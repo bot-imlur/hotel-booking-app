@@ -1,0 +1,40 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rajmandir-kunj",
+  "main": ".open-next/worker.js",
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"compatibility_date": "2026-03-10",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "hotel-db",
+			"database_id": "local"
+		}
+	],
+  // Secrets (JWT_SECRET etc.) are NOT stored here.
+  // Local dev: create a .dev.vars file (see .dev.vars.example).
+  // Production: run `npx wrangler secret put JWT_SECRET`
+  "env": {
+    "production": {
+      "routes": [
+        {
+          "pattern": "rjk.imlur.com",
+          "custom_domain": true
+        }
+      ],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "hotel-db",
+          "database_id": "db5df36c-c6ff-41e2-bd9a-07fd5edf8c64"
+        }
+      ]
+    }
+  }
+}

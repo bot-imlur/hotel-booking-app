@@ -1,0 +1,47 @@
+.container { display: flex; flex-direction: column; gap: var(--space-xl); }
+.container h2 { font-size: 1.5rem; font-weight: 700; }
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+
+/* Room Card */
+.roomCard { text-align: left; }
+.roomCardActive { border-color: var(--accent-primary) !important; background: var(--accent-primary-glow) !important; }
+.roomHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); }
+.roomNumber { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+.roomInfo { display: flex; flex-direction: column; gap: 2px; font-size: 0.75rem; color: var(--text-secondary); }
+.roomRate { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-top: var(--space-xs); }
+
+/* Detail Panel */
+.detail { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.detailHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md); }
+.detailHeader h3 { font-size: 1.1rem; font-weight: 700; display: inline; }
+
+/* Detail info */
+.detailInfo { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-lg); }
+.detailRow { display: flex; justify-content: space-between; font-size: 0.85rem; padding: var(--space-sm) 0; border-bottom: 1px solid var(--border); }
+.detailRow span:first-child { color: var(--text-secondary); }
+
+/* Edit form */
+.editForm { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-bottom: var(--space-lg); }
+.editActions { grid-column: span 2; display: flex; gap: var(--space-sm); }
+
+/* Bookings table */
+.bookingsSection { margin-top: var(--space-md); }
+.bookingsSection h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: var(--space-md); }
+.bookingTable { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius-md); overflow: hidden; }
+.tableHeader, .tableRow { display: grid; grid-template-columns: 100px 100px 1fr 80px 80px 100px; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); background: var(--bg-primary); font-size: 0.8rem; align-items: center; }
+.tableHeader { background: var(--bg-tertiary); font-weight: 700; color: var(--text-secondary); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em; }
+.tableRowClickable { cursor: pointer; transition: background var(--transition-fast); }
+.tableRowClickable:hover { background: var(--bg-secondary) !important; }
+.guestName { font-weight: 600; }
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .editForm { grid-template-columns: 1fr; }
+  .editActions { grid-column: span 1; }
+  .tableHeader, .tableRow { grid-template-columns: 1fr 1fr 1fr; font-size: 0.7rem; }
+  .tableHeader span:nth-child(4), .tableHeader span:nth-child(5), .tableRow span:nth-child(4), .tableRow span:nth-child(5) { display: none; }
+}
+
+@media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }

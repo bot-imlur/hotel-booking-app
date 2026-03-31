@@ -1,0 +1,51 @@
+.container { display: flex; flex-direction: column; gap: var(--space-lg); }
+.header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-md); }
+.header h2 { font-size: 1.5rem; font-weight: 700; }
+.monthNav { display: flex; align-items: center; gap: var(--space-sm); }
+.monthLabel { font-size: 0.95rem; font-weight: 600; min-width: 160px; text-align: center; }
+
+.calendarWrapper { display: flex; gap: var(--space-lg); }
+
+/* Calendar Grid */
+.calendar { flex: 1; min-width: 0; }
+.dayHeaders { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: var(--space-sm); }
+.dayHeader { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; padding: var(--space-sm); }
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+
+/* Day Cell */
+.cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: var(--space-sm) var(--space-xs); min-height: 72px; border-radius: var(--radius-md); background: var(--bg-card); border: 1px solid transparent; transition: all var(--transition-fast); cursor: pointer; }
+.cell:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--border-hover); transform: translateY(-1px); }
+.cellOutside { opacity: 0.25; cursor: default; }
+.cellToday { border-color: var(--accent-primary) !important; box-shadow: 0 0 0 1px var(--accent-primary); }
+.cellSelected { border-color: var(--accent-primary-hover) !important; background: var(--accent-primary-glow) !important; }
+.cellDay { font-size: 0.85rem; font-weight: 600; }
+.cellBadge { font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: var(--radius-full); }
+
+/* Occupancy colors */
+.cellLow .cellBadge { background: var(--occupancy-low-bg); color: var(--occupancy-low); }
+.cellMedium .cellBadge { background: var(--occupancy-medium-bg); color: var(--occupancy-medium); }
+.cellHigh .cellBadge { background: var(--occupancy-high-bg); color: var(--occupancy-high); }
+.cellFull .cellBadge { background: var(--occupancy-full-bg); color: var(--occupancy-full); }
+.cellFull { animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { box-shadow: none; } 50% { box-shadow: 0 0 12px var(--occupancy-full-bg); } }
+
+/* Drawer */
+.drawer { width: 380px; min-width: 380px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-lg); max-height: calc(100vh - 140px); overflow-y: auto; animation: slideIn 0.25s ease; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+.drawerHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-sm); margin-bottom: var(--space-md); }
+.drawerHeader h3 { font-size: 0.95rem; font-weight: 700; }
+.drawerSummary { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: var(--space-md); }
+
+/* Booking Cards in drawer */
+.bookingList { display: flex; flex-direction: column; gap: var(--space-sm); }
+.bookingCard { padding: var(--space-md) !important; }
+.bookingHeader { display: flex; justify-content: space-between; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-xs); }
+.guestName { font-size: 0.9rem; font-weight: 700; }
+.bookingDates { font-size: 0.75rem; color: var(--text-muted); margin-bottom: var(--space-sm); }
+.bookingRooms { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-sm); }
+.roomChip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: var(--radius-full); background: var(--bg-tertiary); font-size: 0.75rem; font-weight: 700; }
+.roomChip small { font-weight: 500; color: var(--text-muted); }
+.bookingFooter { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 700; }
+.noBookings { text-align: center; color: var(--text-muted); padding: var(--space-xl) 0; }
+
+@media (max-width: 900px) { .calendarWrapper { flex-direction: column; } .drawer { width: 100%; min-width: 0; } .cell { min-height: 56px; padding: var(--space-xs); } }
