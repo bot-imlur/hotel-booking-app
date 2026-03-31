@@ -16,6 +16,7 @@ const bookingRoomSchema = z.object({
   room_id: z.number().int().positive(),
   num_guests: z.number().int().min(1).max(5),
   extra_mattresses: z.number().int().min(0).max(2),
+  mattress_rate_per_night: z.number().min(0).default(500),
   rate_per_night: z.number().min(0),
 });
 

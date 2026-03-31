@@ -1,5 +1,0 @@
-# Copy this file to .dev.vars and fill in real values for local development.
-# For production, set these as Cloudflare Worker secrets:
-#   npx wrangler secret put JWT_SECRET
-
-JWT_SECRET=your-strong-jwt-secret-here

@@ -6,6 +6,7 @@ import styles from "./page.module.css";
 import { formatCurrency, SOURCE_CONFIG, BOOKING_SOURCES } from "@/lib/utils";
 
 const STEPS = ["Guest Details", "Dates & Source", "Select Rooms", "Review & Pay"];
+const DEFAULT_MATTRESS_RATE = 500;
 
 export default function NewBookingPage() {
   const router = useRouter();
@@ -20,14 +21,26 @@ export default function NewBookingPage() {
   const [selectedRooms, setSelectedRooms] = useState({});
   const [payment, setPayment] = useState({ advance_paid: 0, notes: "" });
 
+  function toNumber(value, fallback = 0) {
+    if (value === "" || value === null || value === undefined) return fallback;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
   // Calculate nights
   const nights = dates.check_in_date && dates.check_out_date && dates.check_out_date > dates.check_in_date
     ? Math.round((new Date(dates.check_out_date) - new Date(dates.check_in_date)) / 86400000)
     : 0;
 
   // Calculate total
-  const totalAmount = Object.values(selectedRooms).reduce((sum, r) => sum + r.rate_per_night * nights, 0);
-  const balanceDue = totalAmount - payment.advance_paid;
+  const totalAmount = Object.values(selectedRooms).reduce((sum, r) => {
+    const extraMattresses = toNumber(r.extra_mattresses, 0);
+    const mattressRate = toNumber(r.mattress_rate_per_night, 0);
+    const roomRate = toNumber(r.rate_per_night, 0);
+    const mattressCostPerNight = extraMattresses * mattressRate;
+    return sum + (roomRate + mattressCostPerNight) * nights;
+  }, 0);
+  const balanceDue = totalAmount - toNumber(payment.advance_paid, 0);
 
   async function fetchAvailability() {
     if (!dates.check_in_date || !dates.check_out_date || nights <= 0) return;
@@ -49,7 +62,14 @@ export default function NewBookingPage() {
     } else {
       setSelectedRooms({
         ...selectedRooms,
-        [id]: { room_id: id, num_guests: 1, extra_mattresses: 0, rate_per_night: room.default_rate, room },
+        [id]: {
+          room_id: id,
+          num_guests: 1,
+          extra_mattresses: 0,
+          mattress_rate_per_night: DEFAULT_MATTRESS_RATE,
+          rate_per_night: room.default_rate,
+          room,
+        },
       });
     }
   }
@@ -57,7 +77,7 @@ export default function NewBookingPage() {
   function updateRoomConfig(roomId, field, value) {
     setSelectedRooms({
       ...selectedRooms,
-      [roomId]: { ...selectedRooms[roomId], [field]: Number(value) },
+      [roomId]: { ...selectedRooms[roomId], [field]: value === "" ? "" : Number(value) },
     });
   }
 
@@ -92,13 +112,14 @@ export default function NewBookingPage() {
       const body = {
         ...guest,
         ...dates,
-        advance_paid: payment.advance_paid,
+        advance_paid: toNumber(payment.advance_paid, 0),
         notes: payment.notes,
         rooms: Object.values(selectedRooms).map(({ room, ...rest }) => ({
           room_id: rest.room_id,
-          num_guests: rest.num_guests,
-          extra_mattresses: rest.extra_mattresses,
-          rate_per_night: rest.rate_per_night,
+          num_guests: Math.max(1, toNumber(rest.num_guests, 1)),
+          extra_mattresses: Math.max(0, toNumber(rest.extra_mattresses, 0)),
+          mattress_rate_per_night: Math.max(0, toNumber(rest.mattress_rate_per_night, DEFAULT_MATTRESS_RATE)),
+          rate_per_night: Math.max(0, toNumber(rest.rate_per_night, 0)),
         })),
       };
 
@@ -237,30 +258,63 @@ export default function NewBookingPage() {
 
                       {selected && (
                         <div className={styles.roomConfig}>
-                          <div className="form-group">
-                            <label className="form-label">Guests</label>
-                            <input type="number" className="form-input" min={1}
-                              max={room.base_capacity + (selectedRooms[room.id]?.extra_mattresses || 0)}
-                              value={selectedRooms[room.id].num_guests}
-                              onFocus={(e) => e.target.select()}
-                              onChange={(e) => updateRoomConfig(room.id, "num_guests", e.target.value)} />
+                          <div className={`form-group ${styles.compactPairGroup}`}>
+                            <label className="form-label">Guests / Room Rate</label>
+                            <div className={styles.compactPair}>
+                              <input
+                                type="number"
+                                className={`form-input ${styles.countInput}`}
+                                min={1}
+                                max={room.base_capacity + toNumber(selectedRooms[room.id]?.extra_mattresses, 0)}
+                                value={selectedRooms[room.id].num_guests}
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => updateRoomConfig(room.id, "num_guests", e.target.value)}
+                                aria-label="Number of guests"
+                              />
+                              <span className={styles.compactPairSeparator}>/</span>
+                              <input
+                                type="number"
+                                className={`form-input ${styles.rateInput}`}
+                                min={0}
+                                value={selectedRooms[room.id].rate_per_night}
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => updateRoomConfig(room.id, "rate_per_night", e.target.value)}
+                                aria-label="Room rate per night"
+                              />
+                            </div>
                           </div>
-                          <div className="form-group">
-                            <label className="form-label">Extra Mattresses</label>
-                            <input type="number" className="form-input" min={0} max={room.max_extra_mattresses}
-                              value={selectedRooms[room.id].extra_mattresses}
-                              onFocus={(e) => e.target.select()}
-                              onChange={(e) => updateRoomConfig(room.id, "extra_mattresses", e.target.value)} />
-                          </div>
-                          <div className="form-group">
-                            <label className="form-label">Rate/Night (₹)</label>
-                            <input type="number" className="form-input" min={0}
-                              value={selectedRooms[room.id].rate_per_night}
-                              onFocus={(e) => e.target.select()}
-                              onChange={(e) => updateRoomConfig(room.id, "rate_per_night", e.target.value)} />
+                          <div className={`form-group ${styles.compactPairGroup}`}>
+                            <label className="form-label">Mattress (Count / Rate)</label>
+                            <div className={styles.compactPair}>
+                              <input
+                                type="number"
+                                className={`form-input ${styles.countInput}`}
+                                min={0}
+                                max={room.max_extra_mattresses}
+                                value={selectedRooms[room.id].extra_mattresses}
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => updateRoomConfig(room.id, "extra_mattresses", e.target.value)}
+                                aria-label="Extra mattresses count"
+                              />
+                              <span className={styles.compactPairSeparator}>/</span>
+                              <input
+                                type="number"
+                                className={`form-input ${styles.rateInput}`}
+                                min={0}
+                                value={selectedRooms[room.id].mattress_rate_per_night}
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => updateRoomConfig(room.id, "mattress_rate_per_night", e.target.value)}
+                                aria-label="Mattress rate per night"
+                              />
+                            </div>
                           </div>
                           <div className={styles.roomSubtotal}>
-                            Subtotal: {formatCurrency(selectedRooms[room.id].rate_per_night * nights)}
+                            Subtotal: {formatCurrency(
+                              (toNumber(selectedRooms[room.id].rate_per_night, 0) +
+                                toNumber(selectedRooms[room.id].extra_mattresses, 0) *
+                                  toNumber(selectedRooms[room.id].mattress_rate_per_night, 0)) *
+                                nights
+                            )}
                           </div>
                         </div>
                       )}
@@ -295,14 +349,17 @@ export default function NewBookingPage() {
             <h4>Rooms</h4>
             <div className={styles.reviewTable}>
               <div className={styles.reviewTableRow} style={{ fontWeight: 700, color: "var(--text-secondary)", fontSize: "0.75rem" }}>
-                <span>Room</span><span>Guests</span><span>Rate/Night</span><span>Subtotal</span>
+                <span>Room</span><span>Guests</span><span>Rate + Mattress/Night</span><span>Subtotal</span>
               </div>
               {Object.values(selectedRooms).map((r) => (
                 <div key={r.room_id} className={styles.reviewTableRow}>
                   <span>{r.room?.room_number}</span>
-                  <span>{r.num_guests}👤 {r.extra_mattresses > 0 ? `+${r.extra_mattresses}🛏️` : ""}</span>
-                  <span>{formatCurrency(r.rate_per_night)}</span>
-                  <span>{formatCurrency(r.rate_per_night * nights)}</span>
+                  <span>{toNumber(r.num_guests, 0)}👤 {toNumber(r.extra_mattresses, 0) > 0 ? `+${toNumber(r.extra_mattresses, 0)}🛏️` : ""}</span>
+                  <span>
+                    {formatCurrency(toNumber(r.rate_per_night, 0))}
+                    {toNumber(r.extra_mattresses, 0) > 0 && ` + ${formatCurrency(toNumber(r.extra_mattresses, 0) * toNumber(r.mattress_rate_per_night, 0))}`}
+                  </span>
+                  <span>{formatCurrency((toNumber(r.rate_per_night, 0) + toNumber(r.extra_mattresses, 0) * toNumber(r.mattress_rate_per_night, 0)) * nights)}</span>
                 </div>
               ))}
             </div>
@@ -318,7 +375,7 @@ export default function NewBookingPage() {
               <input type="number" className="form-input" min={0} max={totalAmount}
                 value={payment.advance_paid}
                 onFocus={(e) => e.target.select()}
-                onChange={(e) => setPayment({ ...payment, advance_paid: Number(e.target.value) })} />
+                onChange={(e) => setPayment({ ...payment, advance_paid: e.target.value === "" ? "" : Number(e.target.value) })} />
             </div>
             <div className={styles.balanceInfo}>
               <span>Balance Due</span>

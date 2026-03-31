@@ -2,7 +2,7 @@
 .container h2 { font-size: 1.5rem; font-weight: 700; }
 
 /* Stepper */
-.stepper { display: flex; gap: var(--space-xs); }
+.stepper { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 .step { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 500; color: var(--text-muted); background: var(--bg-card); transition: all var(--transition-fast); }
 .stepActive { color: var(--accent-primary-hover); background: var(--accent-primary-glow); }
 .stepDone { color: var(--accent-success); }
@@ -49,16 +49,22 @@
 .roomMeta { padding: 0 var(--space-md) var(--space-sm); font-size: 0.75rem; color: var(--text-muted); }
 
 /* Room config (expanded when selected) */
-.roomConfig { padding: var(--space-md); padding-top: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 160px)); gap: var(--space-sm); border-top: 1px solid var(--border); margin-top: var(--space-sm); padding-top: var(--space-sm); }
-.roomSubtotal { grid-column: span 3; text-align: right; font-size: 0.85rem; font-weight: 700; color: var(--accent-primary); padding-top: var(--space-xs); }
+.roomConfig { padding: var(--space-md); padding-top: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--space-xl); row-gap: var(--space-sm); border-top: 1px solid var(--border); margin-top: var(--space-sm); padding-top: var(--space-sm); align-items: end; }
+.roomSubtotal { grid-column: 1 / -1; text-align: right; font-size: 0.85rem; font-weight: 700; color: var(--accent-primary); padding-top: var(--space-xs); }
+.compactPairGroup { min-width: 0; }
+.compactPair { display: flex; gap: 4px; align-items: center; justify-content: flex-start; min-width: 0; }
+.compactPair :global(.form-input) { min-width: 0; width: 100%; }
+.countInput { width: 84px; flex: 0 0 84px; }
+.rateInput { width: 160px; flex: 0 0 160px; }
+.compactPairSeparator { color: var(--text-muted); font-weight: 700; text-align: center; padding: 0; line-height: 1; }
 
 /* Review */
 .reviewTitle { font-size: 1.1rem; font-weight: 700; margin-bottom: var(--space-md); }
 .reviewSection { margin-bottom: var(--space-lg); }
 .reviewSection h4 { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: var(--space-xs); }
 .reviewSection p { font-size: 0.9rem; }
-.reviewTable { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-top: var(--space-sm); }
-.reviewTableRow { display: grid; grid-template-columns: 70px 1fr 100px 100px; padding: var(--space-sm) var(--space-md); background: var(--bg-primary); font-size: 0.85rem; }
+.reviewTable { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius-sm); overflow-x: auto; margin-top: var(--space-sm); }
+.reviewTableRow { display: grid; grid-template-columns: 70px 1fr 190px 120px; padding: var(--space-sm) var(--space-md); background: var(--bg-primary); font-size: 0.85rem; min-width: 520px; }
 
 /* Total */
 .totalSection { padding: var(--space-md) 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: var(--space-md); }
@@ -66,10 +72,20 @@
 .grandTotal { font-size: 1.5rem; font-weight: 800; color: var(--accent-primary); }
 
 /* Payment */
-.paymentInputs { display: flex; align-items: flex-end; gap: var(--space-lg); margin-bottom: var(--space-md); }
+.paymentInputs { display: flex; align-items: flex-end; gap: var(--space-lg); margin-bottom: var(--space-md); flex-wrap: wrap; }
 .balanceInfo { display: flex; flex-direction: column; gap: 2px; }
 .balanceInfo span:first-child { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
 .balanceAmount { font-size: 1.1rem; font-weight: 700; }
 
 /* Nav buttons */
 .nav { display: flex; gap: var(--space-sm); align-items: center; padding-top: var(--space-md); border-top: 1px solid var(--border); }
+
+@media (max-width: 900px) {
+  .roomConfig { grid-template-columns: 1fr; }
+  .countInput { width: 80px; flex-basis: 80px; }
+  .rateInput { width: 140px; flex-basis: 140px; }
+}
+
+@media (max-width: 520px) {
+  .roomConfig { grid-template-columns: 1fr; }
+}

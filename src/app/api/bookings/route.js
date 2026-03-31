@@ -159,7 +159,9 @@ export async function POST(request) {
 
     let totalAmount = extraTotal;
     const roomTotals = data.rooms.map((br) => {
-      const roomTotal = br.rate_per_night * numNights;
+      const mattressRate = br.mattress_rate_per_night ?? 500;
+      const roomTotal =
+        (br.rate_per_night + br.extra_mattresses * mattressRate) * numNights;
       totalAmount += roomTotal;
       return roomTotal;
     });
